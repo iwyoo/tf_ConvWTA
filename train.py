@@ -11,7 +11,6 @@ ckpt_path = "ckpt/model.ckpt"
 
 epochs = 100
 batch_size = 100
-display_step = 1
 learning_rate = 1e-3
 shape = [batch_size, 28, 28, 1]
 
