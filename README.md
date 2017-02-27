@@ -31,7 +31,7 @@ ae.restore(save_path)
 
 ## Result
 - MNIST [2]
-![alt tag](img/grid.tif) 
+![alt tag](img/grid.gif) 
 
 ## Reference
 - [1] Makhzani, Alireza, and Brendan J. Frey. "Winner-take-all autoencoders." Advances in Neural Information Processing Systems. 2015.
