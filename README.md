@@ -31,6 +31,7 @@ ae.restore(save_path)
 
 ## Result
 - MNIST [2]
+
 ![alt tag](img/grid.gif) 
 
 ## Reference
