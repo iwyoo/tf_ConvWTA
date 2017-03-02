@@ -10,7 +10,7 @@ if not os.path.isdir(ckpt_dir):
 ckpt_path = "ckpt/model.ckpt"
 
 epochs = 100
-batch_size = 100
+batch_size = 200
 learning_rate = 1e-3
 shape = [batch_size, 28, 28, 1]
 
@@ -40,6 +40,7 @@ for epoch in range(epochs):
     batch_x = batch_x.reshape(shape)
     l, _ =  sess.run([loss, train], {x:batch_x})
     avg_loss += l / total_batch
+    print l
     
   print("Epoch : {:04d}, Loss : {:.9f}".format(epoch+1, avg_loss))
 print("Training time : {}".format(time.time() - start_time))

@@ -63,7 +63,7 @@ class ConvWTA(object):
                        11, 11, 1, 1, "deconv", end=True)
     return y
 
-  def loss(self, x, lifetime_sparsity=0.05):
+  def loss(self, x, lifetime_sparsity=0.20):
     h = self.encoder(x)
     h, winner = self._spatial_sparsity(h)
     h = self._lifetime_sparsity(h, winner, lifetime_sparsity)
@@ -84,7 +84,7 @@ class ConvWTA(object):
       self.f, _ = self._deconv_var(
         self.size[-1], self.size[0], 11, 11, "deconv")
     
-  def _conv_var(self, in_dim, out_dim, k_h, k_w, name, stddev=0.01):
+  def _conv_var(self, in_dim, out_dim, k_h, k_w, name, stddev=0.1):
     with tf.variable_scope(name) as vs:
       k = tf.get_variable('filter',
           [k_h, k_w, in_dim, out_dim],
@@ -93,7 +93,7 @@ class ConvWTA(object):
         initializer=tf.constant_initializer(0.0001))
     return k, b
 
-  def _deconv_var(self, in_dim, out_dim, k_h, k_w, name, stddev=0.01):
+  def _deconv_var(self, in_dim, out_dim, k_h, k_w, name, stddev=0.1):
     with tf.variable_scope(name) as vs:
       k = tf.get_variable('filter',
           [k_h, k_w, out_dim, in_dim],
@@ -103,23 +103,21 @@ class ConvWTA(object):
     return k, b
 
   def _conv(self, x, out_dim, 
-            k_h, k_w, s_h, s_w, name, stddev=0.01, end=False):
+            k_h, k_w, s_h, s_w, name, end=False):
     with tf.variable_scope(name, reuse=True) as vs:
-      k = tf.get_variable('filter',
-        [k_h, k_w, x.get_shape()[-1], out_dim])
-      conv = tf.nn.conv2d(x, k, [1, s_h, s_w, 1], "SAME")
-      b = tf.get_variable('biases', [out_dim])
-    return conv + b if end else tf.nn.relu(conv + b)
+      k = tf.get_variable('filter')
+      b = tf.get_variable('biases')
+      conv = tf.nn.conv2d(x, k, [1, s_h, s_w, 1], "SAME") + b
+    return conv if end else tf.nn.relu(conv)
 
   def _deconv(self, x, out_shape, out_dim,
-            k_h, k_w, s_h, s_w, name, stddev=0.01, end=False):
+            k_h, k_w, s_h, s_w, name, end=False):
     with tf.variable_scope(name, reuse=True) as vs:
-      k = tf.get_variable('filter',
-        [k_h, k_w, out_dim, x.get_shape()[-1]])
+      k = tf.get_variable('filter')
+      b = tf.get_variable('biases')
       deconv = tf.nn.conv2d_transpose(
-        x, k, out_shape, [1, s_h, s_w, 1], "SAME")
-      b = tf.get_variable('biases', [out_dim])
-    return deconv + b if end else tf.nn.relu(deconv + b)
+        x, k, out_shape, [1, s_h, s_w, 1], "SAME") + b
+    return deconv if end else tf.nn.relu(deconv)
 
   def _spatial_sparsity(self, h):
     shape = tf.shape(h)
@@ -137,7 +135,7 @@ class ConvWTA(object):
     # spatially dropped & winner
     return h*drop, tf.reshape(th, tf.pack([n, c])) # n, c
     
-  def _lifetime_sparsity(self, h, winner, rate=0.05):
+  def _lifetime_sparsity(self, h, winner, rate):
     shape = tf.shape(winner)
     n = shape[0]
     c = shape[1]
