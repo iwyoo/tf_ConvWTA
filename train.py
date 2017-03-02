@@ -40,7 +40,6 @@ for epoch in range(epochs):
     batch_x = batch_x.reshape(shape)
     l, _ =  sess.run([loss, train], {x:batch_x})
     avg_loss += l / total_batch
-    print l
     
   print("Epoch : {:04d}, Loss : {:.9f}".format(epoch+1, avg_loss))
 print("Training time : {}".format(time.time() - start_time))
