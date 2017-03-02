@@ -55,7 +55,7 @@ class ConvWTA(object):
       h = self._conv(h, self.size[3], 5, 5, 1, 1, "conv_3")
     return h
 
-  def decoder(self, h):
+  def _decoder(self, h):
     shape = tf.shape(h)
     out_shape = tf.pack([shape[0], shape[1], shape[2], 1])
     with tf.variable_scope(self.name) as vs:
@@ -67,13 +67,14 @@ class ConvWTA(object):
     h = self.encoder(x)
     h, winner = self._spatial_sparsity(h)
     h = self._lifetime_sparsity(h, winner, lifetime_sparsity)
-    y = self.decoder(h)
+    y = self._decoder(h)
 
     return tf.reduce_sum(tf.square(y - x))
 
   def reconstruct(self, x):
     h = self.encoder(x)
-    y = self.decoder(h)
+    h, _ = self._spatial_sparsity(h)
+    y = self._decoder(h)
     return y
     
   def _set_variables(self):

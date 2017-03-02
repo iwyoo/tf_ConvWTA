@@ -13,7 +13,7 @@ if not os.path.isdir(recon_dir):
   os.makedirs(recon_dir)
 
 sess = tf.Session()
-ae = ConvWTA(sess)
+ae = ConvWTA(sess, num_features=60)
 ae.restore("ckpt/model.ckpt")
 
 # Data read & train
@@ -25,14 +25,12 @@ f = ae.features()
 for idx in range(f.shape[-1]):
   Image.fromarray(f[:,:,0,idx]).save("{}/{:03d}.tif".format(dict_dir, idx+1))
 
-
 # Save recon images
 x = tf.placeholder(tf.float32, [1, 28, 28, 1])
-y = ae.decoder(ae.encoder(x))
+y = ae.reconstruct(x)
 
 for i in range(20):
   image = mnist.test.images[i, :]
   image = image.reshape([1, 28, 28, 1])
   result = sess.run(y, {x:image})
-  result = np.clip(result, 0, 1)
   Image.fromarray(result[0,:,:,0]).save("{}/{:03d}.tif".format(recon_dir, i+1))

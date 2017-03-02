@@ -10,15 +10,15 @@ if not os.path.isdir(ckpt_dir):
 ckpt_path = "ckpt/model.ckpt"
 
 epochs = 15
-batch_size = 200
+batch_size = 100
 learning_rate = 1e-3
 shape = [batch_size, 28, 28, 1]
 
 # Basic tensorflow setting
 sess = tf.Session()
-ae = ConvWTA(sess)
+ae = ConvWTA(sess, num_features=60)
 x = tf.placeholder(tf.float32, shape)
-loss = ae.loss(x, lifetime_sparsity=0.20)
+loss = ae.loss(x, lifetime_sparsity=0.05)
 
 optim = tf.train.AdamOptimizer(learning_rate=learning_rate)
 train = optim.minimize(loss, var_list=ae.t_vars)
