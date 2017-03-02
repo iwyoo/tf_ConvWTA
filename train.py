@@ -9,7 +9,7 @@ if not os.path.isdir(ckpt_dir):
   os.makedirs(ckpt_dir)
 ckpt_path = "ckpt/model.ckpt"
 
-epochs = 100
+epochs = 15
 batch_size = 200
 learning_rate = 1e-3
 shape = [batch_size, 28, 28, 1]
