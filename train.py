@@ -18,7 +18,7 @@ shape = [batch_size, 28, 28, 1]
 sess = tf.Session()
 ae = ConvWTA(sess)
 x = tf.placeholder(tf.float32, shape)
-loss = ae.loss(x)
+loss = ae.loss(x, lifetime_sparsity=0.20)
 
 optim = tf.train.AdamOptimizer(learning_rate=learning_rate)
 train = optim.minimize(loss, var_list=ae.t_vars)
