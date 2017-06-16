@@ -6,9 +6,9 @@ Usage :
   ae = ConvWTA(sess)
 
   # 1. to train an Autoencoder
-  loss = ae.loss()
+  loss = ae.loss(x)
   train = optimizer.minimize(loss)
-  sess.run(train)
+  sess.run(train, feed_dict={...})
 
   # 2. to get the sparse codes
   h = ae.encoder(x)
