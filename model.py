@@ -57,7 +57,7 @@ class ConvWTA(object):
 
   def _decoder(self, h):
     shape = tf.shape(h)
-    out_shape = tf.pack([shape[0], shape[1], shape[2], 1])
+    out_shape = tf.stack([shape[0], shape[1], shape[2], 1])
     with tf.variable_scope(self.name) as vs:
       y = self._deconv(h, out_shape, self.size[0], 
                        11, 11, 1, 1, "deconv", end=True)
@@ -126,15 +126,15 @@ class ConvWTA(object):
     c = shape[3]
 
     h_t = tf.transpose(h, [0, 3, 1, 2]) # n, c, h, w
-    h_r = tf.reshape(h_t, tf.pack([n, c, -1])) # n, c, h*w
+    h_r = tf.reshape(h_t, tf.stack([n, c, -1])) # n, c, h*w
 
     th, _ = tf.nn.top_k(h_r, 1) # n, c, 1
-    th_r = tf.reshape(th, tf.pack([n, 1, 1, c])) # n, 1, 1, c
-    drop = tf.select(h < th_r, 
+    th_r = tf.reshape(th, tf.stack([n, 1, 1, c])) # n, 1, 1, c
+    drop = tf.where(h < th_r, 
       tf.zeros(shape, tf.float32), tf.ones(shape, tf.float32))
 
     # spatially dropped & winner
-    return h*drop, tf.reshape(th, tf.pack([n, c])) # n, c
+    return h*drop, tf.reshape(th, tf.stack([n, c])) # n, c
     
   def _lifetime_sparsity(self, h, winner, rate):
     shape = tf.shape(winner)
@@ -145,11 +145,11 @@ class ConvWTA(object):
     winner = tf.transpose(winner) # c, n
     th_k, _ = tf.nn.top_k(winner, k) # c, k
 
-    shape_t = tf.pack([c, n])
-    drop = tf.select(winner < th_k[:,k-1:k], # c, n
+    shape_t = tf.stack([c, n])
+    drop = tf.where(winner < th_k[:,k-1:k], # c, n
       tf.zeros(shape_t, tf.float32), tf.ones(shape_t, tf.float32))
     drop = tf.transpose(drop) # n, c
-    return h * tf.reshape(drop, tf.pack([n, 1, 1, c]))
+    return h * tf.reshape(drop, tf.stack([n, 1, 1, c]))
 
   def features(self): 
     return self.sess.run(self.f)
